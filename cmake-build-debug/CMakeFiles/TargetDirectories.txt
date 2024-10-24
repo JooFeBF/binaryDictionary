@@ -1,0 +1,3 @@
+/home/joofe/CLionProjects/untitled2/cmake-build-debug/CMakeFiles/untitled2.dir
+/home/joofe/CLionProjects/untitled2/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/joofe/CLionProjects/untitled2/cmake-build-debug/CMakeFiles/rebuild_cache.dir
