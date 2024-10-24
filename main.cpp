@@ -40,6 +40,7 @@ Implementation Considerations:
  */
 
 #include <iostream>
+#include <strings.h>
 
 using namespace std;
 
@@ -70,13 +71,17 @@ Node* createNode(string word, string meaning, string grammaticalCategory, string
 }
 
 void insertNode(Node* root, Node* newNode) {
-    if (root->word > newNode->word) {
+    if (strcasecmp(newNode->word.c_str(), root->word.c_str()) < 0) {
         if (root->left == nullptr) {
             root->left = newNode;
         } else {
             insertNode(root->left, newNode);
         }
     } else {
+        if(strcasecmp(newNode->word.c_str(), root->word.c_str()) == 0) {
+            cout << "Word already exists in the dictionary.\n";
+            return;
+        }
         if (root->right == nullptr) {
             root->right = newNode;
         } else {
@@ -211,9 +216,50 @@ void listByLetter(Node* root, char letter) {
     listByLetter(root->right, letter);
 }
 
-void listAllWordsA
+void listAllWords (Node* root) {
+    if (root == nullptr) {
+        return;
+    }
+    listAllWords(root->left);
+    showWord(root);
+    listAllWords(root->right);
+}
 
+void showFirstAndLast(Node* root) {
+    if (root == nullptr) {
+        cout << "Dictionary is empty.\n";
+        return;
+    }
+    Node* first = root;
+    while (first->left != nullptr) {
+        first = first->left;
+    }
+    Node* last = root;
+    while (last->right != nullptr) {
+        last = last->right;
+    }
+    cout << "First word: " << first->word << "\n";
+    showWord(first);
+    cout << "Last word: " << last->word << "\n";
+    showWord(last);
+}
 
+int countWords(Node* root) {
+    if (root == nullptr) {
+        return 0;
+    }
+    return 1 + countWords(root->left) + countWords(root->right);
+}
+
+Node *searchWord(Node *root, string word) {
+    if (root == nullptr || root->word == word) {
+        return root;
+    }
+    if (strcasecmp(word.c_str(), root->word.c_str()) < 0) {
+        return searchWord(root->left, word);
+    }
+    return searchWord(root->right, word);
+}
 
 void displayMenu() {
     cout << "Menu:\n";
@@ -227,4 +273,73 @@ void displayMenu() {
     cout << "8. Show the first and last word of the dictionary with their components\n";
     cout << "9. Show the number of words registered in the dictionary\n";
     cout << "10. Exit\n";
+}
+
+int main() {
+    Dictionary dictionary;
+    dictionary.root = nullptr;
+    int choice;
+
+    do {
+        displayMenu();
+        cout << "Enter your choice: ";
+        cin >> choice;
+        switch (choice) {
+            case 1:
+                addWordMenu(&dictionary);
+            break;
+            case 2: {
+                string word;
+                cout << "Enter the word to modify: ";
+                cin >> word;
+                Node *found = searchWord(dictionary.root, word);
+                modifyWordMenu(found);
+                break;
+            }
+            case 3: {
+                string word;
+                cout << "Enter the word to show: ";
+                cin >> word;
+                Node *found = searchWord(dictionary.root, word);
+                showWord(found);
+                break;
+            }
+            case 4: {
+                string word;
+                cout << "Enter the word to delete: ";
+                cin >> word;
+                deleteWord(dictionary.root, word);
+                break;
+            }
+            case 5: {
+                string category;
+                cout << "Enter the grammatical category: ";
+                cin >> category;
+                listByCategory(dictionary.root, category);
+                break;
+            }
+            case 6: {
+                char letter;
+                cout << "Enter the letter: ";
+                cin >> letter;
+                listByLetter(dictionary.root, letter);
+                break;
+            }
+            case 7:
+                listAllWords(dictionary.root);
+            break;
+            case 8:
+                showFirstAndLast(dictionary.root);
+            break;
+            case 9:
+                cout << "Number of words in the dictionary: " << countWords(dictionary.root) << "\n";
+            break;
+            case 10:
+                cout << "Exiting program...\n";
+            break;
+            default:
+                cout << "Invalid choice. Please try again.\n";
+        }
+    } while (choice != 10);
+    return 0;
 }
